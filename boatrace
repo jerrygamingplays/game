@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boat Race</title>
+    <style>
+        *{
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;        
+        }
+        
+        
+        .ship{
+            width: 50px;
+            height: 70px;
+            background-color: blue;
+            position: absolute;
+            bottom: 120px;
+            
+        }
+        .GameArea{
+            width: 600px;
+            height: 100vh;
+            background-color: aqua;
+            margin: auto;
+            position: relative;
+            overflow: hidden;
+        }   
+    
+        
+     
+
+        
+        .other{
+            width: 50px;
+            height: 70px;
+            border-radius: 50px;
+            background-color: black;
+            position: absolute;
+            bottom: 120px;
+        }
+        .Score{
+            position: absolute;
+            top: 60;
+            left: 120;
+            text-align: center;
+            padding-top: 23px;
+            font-size: 30px;
+            line-height: 20px;
+            background-color: blue;
+            color: white;
+            width: 300px;
+            height: 100px;
+             
+        }
+        .StartScreen{
+            position: absolute;
+         
+            color: black;
+            z-index: 1;
+            margin-top: 150px;
+            margin-left:250px;
+            text-align: center;
+            
+            font-size: 30px;
+            width: 50%;
+            height: 200px;
+            cursor: pointer;
+            border-radius: 23px;
+
+        }
+        button{
+            padding: 10px;
+            text-align: center;
+            background-color: yellow;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    
+        <div class="Score">
+
+        </div>
+        <div class="StartScreen">
+            <p>If you hit a naval mine, you lose</p>
+            <button onclick="Reset()">start</button>
+        </div>
+        <div class="GameArea">
+
+        </div>
+    </div>   
+    <script>
+
+        const score=document.querySelector('.Score');
+        const startscreen=document.querySelector('.StartScreen');
+        const gamearea=document.querySelector('.GameArea');
+        let player={ speed:5,score:0};
+        let highest=0;
+        startscreen.addEventListener('click',start);
+
+        let keys={ArrowUp: false, ArrowDown: false, ArrowRight: false, ArrowLeft: false};
+
+        document.addEventListener('keydown',keyDown);
+        document.addEventListener('keyup',keyUp);
+        function keyDown(ev){
+            ev.preventDefault();
+            keys[ev.key]=true;
+
+        }
+        function keyUp(ev){
+            ev.preventDefault();
+            keys[ev.key]=false;
+        }
+    
+   
+        
+        function moveboat(ship){
+            let other=document.querySelectorAll('.other');
+            other.forEach(function(item){
+              
+                   
+                
+                if(item.y>=680){
+                    item.y=-300;
+                    item.style.left=Math.floor(Math.random()*350) + 'px';
+                }
+                item.y+=player.speed;
+                item.style.top=item.y+'px';
+
+            })
+        }
+        function gamePlay(){
+
+let boat=document.querySelector('.ship');
+let sea=gamearea.getBoundingClientRect();
+
+if(player.start){
+        
+        moveboat(boat);
+                if(keys.ArrowUp && player.y>(sea.top+70)){
+                    player.y-=player.speed;
+                }
+                if(keys.ArrowDown && player.y<(sea.bottom-70)){
+                    player.y+=player.speed;
+                }
+                if(keys.ArrowLeft && player.x>0){
+                    player.x-=player.speed;
+                }
+                if(keys.ArrowRight && player.x<(sea.width-50)){
+                    player.x+=player.speed;
+                }
+            }
+
+            boat.style.top=player.y + 'px';
+            boat.style.left=player.x + 'px';    
+
+            window.requestAnimationFrame(gamePlay);
+                
+                player.score++;
+                if(player.score>=highest)
+                {
+                    highest=player.score;
+                }
+                score.innerHTML="Your Score:"+ player.score+"<br><br>"+"Highest Score:"+highest;
+        }
+    
+        function Reset(){
+            highest=0;
+        }
+        function start(){
+            
+          
+            gamearea.innerHTML="";
+
+            player.start=true;
+            player.score=0;
+            window.requestAnimationFrame(gamePlay);
+
+            
+           for(x=0;x<5;x++){
+                let waterline=document.createElement('div');
+                waterline.setAttribute('class','lines');
+                waterline.y=(x*150);
+                waterline.style.top=waterline.y+'px';
+                gamearea.appendChild(waterline);
+            }
+        let ship=document.createElement('div');
+            ship.setAttribute('class','ship');
+            gamearea.appendChild(ship);
+
+            player.x=ship.offsetLeft;
+            player.y=ship.offsetTop;
+            
+            
+            for(x=0;x<3;x++){
+                let othermines=document.createElement('div');
+                    othermines.setAttribute('class','other');
+                        othermines.y=((x+1)*350)* -1;
+                         othermines.style.top=othermines.y+'px';
+                                othermines.style.left=Math.floor(Math.random()*350) + 'px';
+                                     gamearea.appendChild(othermines);
+            }
+        }
+
+
+        
+    </script>
+    </body>
+    </html>
